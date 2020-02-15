@@ -1,6 +1,6 @@
 #' aggregress: A package for regression analysis with aggregated data.
 #'
-#' The aggregress package makes an adjustment to the lm object output
+#' The aggregress package makes adjustments to the lm object output
 #' when the inputted data are aggregated.
 #' The resulting object is indistinguishable from that from the
 #' original unaggregated data.
