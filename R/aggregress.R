@@ -1,4 +1,10 @@
 
+#' Create a revised summary of an lm object.
+#'
+#' @param wtd_lm an lm object from a regression with frequencies as the weights.
+#' @return The revised summary of the lm object \code{wtd_lm}.
+#'
+#'
 adj_wtd_lm_summary <- function(wtd_lm) {
 
   # Copy the lm object.
