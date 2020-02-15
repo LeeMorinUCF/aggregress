@@ -1,13 +1,15 @@
 Package: aggregress
-Title: What the Package Does (One Line, Title Case)
+Title: Regression Analysis with Aggregated Data
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Lee",
+           family = "Morin",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
+           email = "lee.morin.dev@gmail.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: What license it uses
+Description: An adjustment to the lm object output when the inputted data are aggregated. 
+    The resulting object is indistinguishable from that from the original unaggregated data. 
+    It includes adjustments to the statistics and diagnostics. 
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
