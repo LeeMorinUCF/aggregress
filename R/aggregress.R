@@ -1,3 +1,14 @@
+#' aggregress: A package for regression analysis with aggregated data.
+#'
+#' The aggregress package makes an adjustment to the lm object output
+#' when the inputted data are aggregated.
+#' The resulting object is indistinguishable from that from the
+#' original unaggregated data.
+#' It includes adjustments to the statistics and diagnostics.
+#'
+#' @docType package
+#' @name aggregress
+NULL
 
 #' Create a revised summary of an lm object.
 #'
