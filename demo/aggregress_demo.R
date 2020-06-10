@@ -81,7 +81,13 @@ ind_lpm_lm <- lm(y ~ x1 + x2 + x3, data = ind_lpm_data)
 
 wtd_lpm_lm <- lm(y ~ x1 + x2 + x3, data = agg_lpm_data, weights = num)
 
+# Preliminary version.
 agg_lpm_lm_summ <- adj_wtd_lm_summary(wtd_lpm_lm)
+
+# Modified lm function.
+agg_lpm_lm <- agg_lm(y ~ x1 + x2 + x3, data = agg_lpm_data, weights = num)
+
+summary_agg_lm(agg_lpm_lm)
 
 
 #--------------------------------------------------
@@ -89,11 +95,12 @@ agg_lpm_lm_summ <- adj_wtd_lm_summary(wtd_lpm_lm)
 #--------------------------------------------------
 
 
-# Compare.
+# Compare summaries.
 summary(ind_lpm_lm)
 # summary(agg_lpm_lm)
-agg_lpm_lm_summ
-# The summaries are the same.
+summary_agg_lm(agg_lpm_lm)
+
+
 
 # Goal is to make sure that the lm objects are the same.
 

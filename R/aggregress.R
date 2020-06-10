@@ -105,7 +105,7 @@ agg_lm <- function (formula, data, subset, weights, na.action, method = "qr",
   if (is.matrix(y))
     stop("'y' must be a vector when using aggregated data")
   w <- as.vector(model.weights(mf))
-  if (!is.null(w))
+  if (is.null(w))
     stop("'weights' must be specified when using aggregated data")
   if (!is.null(w) && !is.numeric(w))
     stop("'weights' must be a numeric vector")
@@ -174,8 +174,9 @@ summary_agg_lm <- function (object, correlation = FALSE, symbolic.cor = FALSE,
   rdf <- z$df.residual
   if (p == 0) {
     r <- z$residuals
-    n <- length(r)
+    # n <- length(r)
     w <- z$weights
+    n <- sum(w)
     if (is.null(w)) {
       rss <- sum(r^2)
     }
@@ -198,15 +199,16 @@ summary_agg_lm <- function (object, correlation = FALSE, symbolic.cor = FALSE,
   }
   if (is.null(z$terms))
     stop("invalid 'agg_lm' object:  no 'terms' component")
-  if (!inherits(object, "lm"))
+  if (!inherits(object, "agg_lm"))
     warning("calling summary.agg_lm(<fake-lm-object>) ...")
-  Qr <- qr.lm(object)
-  n <- NROW(Qr$qr)
-  if (is.na(z$df.residual) || n - p != z$df.residual)
-    warning("residual degrees of freedom in object suggest this is not an \"lm\" fit")
+  Qr <- stats:::qr.lm(object)
+  # n <- NROW(Qr$qr)
   r <- z$residuals
   f <- z$fitted.values
   w <- z$weights
+  n <- sum(w)
+  if (is.na(z$df.residual) || n - p != z$df.residual)
+    warning("residual degrees of freedom in object suggest this is not an \"lm\" fit")
   if (is.null(w)) {
     mss <- if (attr(z$terms, "intercept"))
       sum((f - mean(f))^2)
