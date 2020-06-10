@@ -6,8 +6,19 @@
 \title{aggregress: A package for regression analysis with aggregated data.}
 \description{
 The aggregress package makes adjustments to the lm object output
-when the inputted data are aggregated.
+when the inputted data are in aggregated form.
+That is, when the data frame has a list of unique values of
+all variables with the frequencies recorded in a column of weights.
 The resulting object is indistinguishable from that from the
 original unaggregated data.
 It includes adjustments to the statistics and diagnostics.
+}
+\details{
+To quote the help files for the \code{lm} function:
+"Therefore, the sigma estimate and residual degrees of freedom
+may be suboptimal; in the case of replication weights, even wrong.
+Hence, standard errors and analysis of variance tables should be
+treated with care."
+This packages makes adjustments so that the sigma estimate and
+residual degrees of freedom are not suboptimal or wrong; they are correct.
 }

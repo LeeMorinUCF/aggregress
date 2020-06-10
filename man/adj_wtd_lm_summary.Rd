@@ -2,16 +2,25 @@
 % Please edit documentation in R/aggregress.R
 \name{adj_wtd_lm_summary}
 \alias{adj_wtd_lm_summary}
-\title{Create a revised summary of an lm object.}
+\title{Summarizing Linear Model Fits with Aggregated Data (DEPRECATED)}
 \usage{
 adj_wtd_lm_summary(wtd_lm)
 }
 \arguments{
-\item{wtd_lm}{an lm object from a regression with frequencies as the weights.}
+\item{object}{an object of class "\code{lm}",
+estimated with \code{weights} equal to the counts in each distinct
+combination of covariates in an aggregated dataset.}
 }
 \value{
-The revised summary of the lm object \code{wtd_lm}.
+\code{adj_wtd_lm_summary} computes and returns a list of summary
+statistics of the fitted linear model given in \code{object}.
 }
 \description{
-Create a revised summary of an lm object.
+A modification of the \code{summary} method for class \code{lm},
+for the case when .
+}
+\seealso{
+Instead, use \code{agg_lm} for model fits to produce objects in class
+"\code{agg_lm}" then summarize with \code{summary_agg_lm}.
+Modifies the \code{summary.lm} function in the \code{stats} library.
 }
