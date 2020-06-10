@@ -63,6 +63,12 @@ usethis::use_build_ignore(c("README.md", ".gitignore", "dev"))
 # check Adding '^README\\.md$', '^\\.gitignore$', '^dev$' to '.Rbuildignore'
 
 
+# Set up testing
+usethis::use_testthat()
+# check Adding 'testthat' to Suggests field in DESCRIPTION
+# check Creating 'tests/testthat/'
+# check Writing 'tests/testthat.R'
+# dot Call `use_test()` to initialize a basic test file and open it for editing.
 
 
 

@@ -1,7 +1,6 @@
 ##################################################
 #
-# TransUnion Credit Card Balances in Alberta
-# Individual Level at Monthly Run Dates
+# Agregress Testing and Demonstration
 #
 # Lealand Morin, Ph.D.
 # Assistant Professor
@@ -20,8 +19,8 @@
 # Dependencies:
 #   None, besides the aggregress package.
 #
-# This script compares the outputs from lm
-# with and without weights witn a LPM.
+# This version compares all output from the lm
+# function and the agg_lm function with a LPM.
 #
 ##################################################
 
@@ -82,7 +81,13 @@ ind_lpm_lm <- lm(y ~ x1 + x2 + x3, data = ind_lpm_data)
 
 wtd_lpm_lm <- lm(y ~ x1 + x2 + x3, data = agg_lpm_data, weights = num)
 
+# Preliminary version.
 agg_lpm_lm_summ <- adj_wtd_lm_summary(wtd_lpm_lm)
+
+# Modified lm function.
+agg_lpm_lm <- agg_lm(y ~ x1 + x2 + x3, data = agg_lpm_data, weights = num)
+
+summary_agg_lm(agg_lpm_lm)
 
 
 #--------------------------------------------------
@@ -90,11 +95,12 @@ agg_lpm_lm_summ <- adj_wtd_lm_summary(wtd_lpm_lm)
 #--------------------------------------------------
 
 
-# Compare.
+# Compare summaries.
 summary(ind_lpm_lm)
 # summary(agg_lpm_lm)
-agg_lpm_lm_summ
-# The summaries are the same.
+summary_agg_lm(agg_lpm_lm)
+
+
 
 # Goal is to make sure that the lm objects are the same.
 
@@ -105,7 +111,7 @@ attributes(ind_lpm_lm)
 # [11] "terms"         "model"
 
 # Compare each attribute with the weighted counterpart.
-agg_lpm_lm <- wtd_lpm_lm
+
 
 # [1,] "coefficients"
 ind_lpm_lm$coefficients
@@ -116,6 +122,8 @@ agg_lpm_lm$coefficients
 summary(ind_lpm_lm$residuals)
 summary(agg_lpm_lm$residuals)
 # Not the same but ok.
+summary(agg_lpm_lm$residuals*agg_lpm_lm$weights)
+# Weighted residuals have mean zero.
 
 # [3,] "effects"
 ind_lpm_lm$effects
@@ -149,11 +157,7 @@ agg_lpm_lm$qr
 # [8,] "df.residual"
 ind_lpm_lm$df.residual
 agg_lpm_lm$df.residual
-# Different by the difference in sample size.
-nrow(ind_lpm_data) - ind_lpm_lm$rank
-# Adjust agg_lpm_lm for the correction.
-sum(agg_lpm_data[, 'num']) - agg_lpm_lm$rank
-
+# Same.
 
 # [9,] "xlevels"
 ind_lpm_lm$xlevels

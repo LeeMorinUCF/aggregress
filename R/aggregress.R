@@ -267,3 +267,39 @@ summary_agg_lm <- function (object, correlation = FALSE, symbolic.cor = FALSE,
 }
 
 
+#' Generate data to test the aggregress package.
+#'
+#' \code{gen_agg_lm} generates data to test the \code{aggregress}
+#' package. It is an internal function used for testing.
+#'
+#' @param model a string to denote the model with which
+#' to generate the data frame.
+#'
+#' @returns a data frame of response and covariates for
+#' linear regression.
+#'
+gen_agg_lm <- function(model) {
+
+  if (model == 'lpm') {
+
+    # Initialize the data frame with covariates.
+    agg_lm_df <- data.frame(expand.grid(x1 = seq(1,3),
+                                        x2 = seq(5,10),
+                                        x3 = c(2, 2, 2, 4, 4, 6)))
+
+    # Add an outcome according to a linear probability model.
+    # All coefficients are ones.
+    agg_lm_df[, 'probs'] <- rowSums(agg_lm_df[, c('x1', 'x2', 'x3')]) / 20
+
+
+    # Draw a binary dependent variable.
+    agg_lm_df[, 'y'] <- as.integer(runif(nrow(agg_lm_df)) <=  agg_lm_df[, 'probs'])
+
+
+  } else {
+    stop(sprintf('Model type %s not supported.', model))
+  }
+
+  return(agg_lm_df)
+
+}
