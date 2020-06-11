@@ -82,7 +82,8 @@ adj_wtd_lm_summary <- function(wtd_lm) {
 #' @export
 #'
 agg_lm <- function (formula, data, subset, weights, na.action, method = "qr",
-                    model = TRUE, x = FALSE, y = FALSE, qr = TRUE, singular.ok = TRUE,
+                    model = TRUE, x = FALSE, y = FALSE, y_squared = NULL,
+                    qr = TRUE, singular.ok = TRUE,
                     contrasts = NULL, offset, ...)
 {
   ret.x <- x
@@ -104,10 +105,14 @@ agg_lm <- function (formula, data, subset, weights, na.action, method = "qr",
   y <- model.response(mf, "numeric")
   if (is.matrix(y))
     stop("'y' must be a vector when using aggregated data")
+  is_LPM <- all(y %in% c(0, 1))
+  if (!is_LPM & is.null(y_squared))
+    stop('For a linear regression model that is not a linear ',
+         "probability model, 'y_squared' must be specified")
   w <- as.vector(model.weights(mf))
   if (is.null(w))
     stop("'weights' must be specified when using aggregated data")
-  if (!is.null(w) && !is.numeric(w))
+  if (!is.numeric(w))
     stop("'weights' must be a numeric vector")
   offset <- as.vector(model.offset(mf))
   if (!is.null(offset)) {
@@ -141,12 +146,15 @@ agg_lm <- function (formula, data, subset, weights, na.action, method = "qr",
   z$xlevels <- .getXlevels(mt, mf)
   z$call <- cl
   z$terms <- mt
+  z$is_LPM <- is_LPM
   if (model)
     z$model <- mf
   if (ret.x)
     z$x <- x
-  if (ret.y)
+  if (ret.y | !is_LPM)
     z$y <- y
+  if (!is_LPM)
+    z$y_squared <- y_squared
   if (!qr)
     z$qr <- NULL
   z
@@ -176,14 +184,12 @@ summary_agg_lm <- function (object, correlation = FALSE, symbolic.cor = FALSE,
     r <- z$residuals
     # n <- length(r)
     w <- z$weights
+    if (is.null(w))
+      stop("model object is not an agg_lm object",
+           "'weights' must be specified when using aggregated data")
     n <- sum(w)
-    if (is.null(w)) {
-      rss <- sum(r^2)
-    }
-    else {
-      rss <- sum(w * r^2)
-      r <- sqrt(w) * r
-    }
+    rss <- sum(w * r^2)
+    # r <- sqrt(w) * r
     resvar <- rss/rdf
     ans <- z[c("call", "terms", "weights")]
     class(ans) <- "summary.lm"
@@ -206,27 +212,30 @@ summary_agg_lm <- function (object, correlation = FALSE, symbolic.cor = FALSE,
   r <- z$residuals
   f <- z$fitted.values
   w <- z$weights
+  y <- z$y
+  y_squared <- z$y_squared
+  if (is.null(w))
+    stop("invalid 'agg_lm' object:",
+         "'weights' must be specified when using aggregated data")
   n <- sum(w)
   if (is.na(z$df.residual) || n - p != z$df.residual)
     warning("residual degrees of freedom in object suggest this is not an \"lm\" fit")
-  if (is.null(w)) {
-    mss <- if (attr(z$terms, "intercept"))
-      sum((f - mean(f))^2)
-    else sum(f^2)
-    rss <- sum(r^2)
+
+  if (attr(z$terms, "intercept")) {
+    m <- sum(w * f/sum(w))
+    mss <- sum(w * (f - m)^2)
+  } else {
+    mss <- sum(w * f^2)
   }
-  else {
-    mss <- if (attr(z$terms, "intercept")) {
-      m <- sum(w * f/sum(w))
-      sum(w * (f - m)^2)
-    }
-    else sum(w * f^2)
+  if (z$is_LPM) {
     rss <- sum(w * r^2)
-    r <- sqrt(w) * r
+  } else {
+    # rss <- sum(w * r^2)
+    rss <- sum(y_squared) - 2*sum(w * y * f) + sum(w * f^2)
   }
+  # r <- sqrt(w) * r
   resvar <- rss/rdf
-  if (is.finite(resvar) && resvar < (mean(f)^2 + var(f)) *
-      1e-30)
+  if (is.finite(resvar) && resvar < (mean(f)^2 + var(f)) * 1e-30)
     warning("essentially perfect fit: summary may be unreliable")
   p1 <- 1L:p
   R <- chol2inv(Qr$qr[p1, p1, drop = FALSE])

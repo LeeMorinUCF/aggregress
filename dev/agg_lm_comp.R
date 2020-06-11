@@ -64,6 +64,10 @@ agg_lpm_data <- aggregate(num ~ y + x1 + x2 + x3,
                       data = ind_lpm_data,
                       FUN = sum)
 
+# Test that this is an LPM.
+all(agg_lpm_data[, 'y'] %in% c(0, 1))
+
+
 
 #--------------------------------------------------
 # Estimate Linear Model from Individual Data
@@ -224,6 +228,10 @@ agg_lm_data[, 'y_bar'] <- agg_lm_data[, 'y']/agg_lm_data[, 'num']
 
 summary(agg_lm_data)
 
+# Test that this is an LPM.
+all(agg_lm_data[, 'y'] %in% c(0, 1))
+
+
 #--------------------------------------------------
 # Estimate Linear Model from Individual Data
 #--------------------------------------------------
@@ -237,7 +245,10 @@ ind_lm_reg <- lm(y ~ x1 + x2 + x3, data = ind_lm_data)
 
 # Modified lm function.
 # agg_lm_reg <- agg_lm(y ~ x1 + x2 + x3, data = agg_lm_data, weights = num)
-agg_lm_reg <- agg_lm(y_bar ~ x1 + x2 + x3, data = agg_lm_data, weights = num)
+# agg_lm_reg <- agg_lm(y_bar ~ x1 + x2 + x3, data = agg_lm_data, weights = num)
+agg_lm_reg <- agg_lm(y_bar ~ x1 + x2 + x3, data = agg_lm_data, weights = num,
+                     y_squared = agg_lm_data[, 'y_squared'])
+# This looks ugly but let's get it working first.
 
 
 #--------------------------------------------------
@@ -308,11 +319,14 @@ agg_lm_reg_summ$terms
 summary(ind_lm_reg_summ$residuals)
 summary(agg_lm_reg_summ$residuals)
 summary(agg_lm_reg_summ$residuals*agg_lm_reg$weights)
-
-summary(agg_lm_reg$residuals*agg_lm_reg$weights)
-
-summary(agg_lm_reg$residuals - agg_lm_reg_summ$residuals)
-# Not sure why these residuals don't match.
+# Works now. Previous version had sqrt(weights).
+# summary(agg_lm_reg$residuals*agg_lm_reg$weights)
+#
+# summary(agg_lm_reg$residuals - agg_lm_reg_summ$residuals)
+# # Not sure why these residuals don't match.
+# # Try this:
+# summary(agg_lm_reg_summ$residuals*sqrt(agg_lm_reg$weights))
+# # Bingo.
 
 # [4,] "coefficients"
 ind_lm_reg_summ$coefficients
@@ -325,7 +339,7 @@ agg_lm_reg_summ$coefficients[, 'Std. Error']
 agg_lm_reg_summ$coefficients[, 'Std. Error'] /
   ind_lm_reg_summ$coefficients[, 'Std. Error']
 # Off by the same factor. The s^2 needs adjustment.
-
+# Now they are correct.
 
 # [5,] "aliased"
 ind_lm_reg_summ$aliased
@@ -338,6 +352,24 @@ agg_lm_reg_summ$sigma
 # Not equal but check ratio.
 agg_lm_reg_summ$sigma / ind_lm_reg_summ$sigma
 # Same ratio as for standard errors.
+# (which is now correct).
+
+# Correct sigma. Goal:
+ind_lm_reg_summ$sigma
+sqrt(sum(ind_lm_reg_summ$residuals^2)/ind_lm_reg$df.residual)
+# Repeat for model on aggregated data.
+sqrt(sum(agg_lm_reg$weights * agg_lm_reg_summ$residuals^2)/agg_lm_reg$df.residual)
+# Reproduced (incorrect) calculated value.
+
+# Reproduce RSS.
+rss_check_ind <- sum(ind_lm_reg_summ$residuals^2)
+w_A <- agg_lm_reg$weights
+y_A <- agg_lm_data[, 'y_bar']
+y2_A <- agg_lm_data[, 'y_squared']
+f_A <- agg_lm_reg$fitted.values
+# rss_check_agg <- sum(w_A * y_A) - 2*sum(w_A * y_A * f_A) + sum(w_A * f_A^2)
+rss_check_agg <- sum(y2_A) - 2*sum(w_A * y_A * f_A) + sum(w_A * f_A^2)
+# Bingo.
 
 # [7,] "df"
 ind_lm_reg_summ$df

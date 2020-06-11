@@ -52,6 +52,7 @@ agg_lpm_data <- aggregate(num ~ y + x1 + x2 + x3,
                       FUN = sum)
 
 
+
 #--------------------------------------------------
 # Estimate Linear Model from Individual Data
 #--------------------------------------------------
