@@ -289,9 +289,10 @@ summary_agg_lm <- function (object, correlation = FALSE, symbolic.cor = FALSE,
 #'
 #' @param model a string to denote the model with which
 #' to generate the data frame. It can be 'lpm' for a linear
-#' proability model, 'lm' for a linear regression model.
+#' proability model, 'lm' for a linear regression model
+#' or 'log' for a logistic regression model.
 #'
-#' @returns a data frame of response and covariates for
+#' @returns a data frame of response variables and covariates for
 #' linear regression.
 #'
 gen_agg_lm <- function(model) {
@@ -325,8 +326,27 @@ gen_agg_lm <- function(model) {
     aggreg_df[, 'X_beta'] <- rowSums(aggreg_df[, c('x1', 'x2', 'x3')]) / 20
 
 
-    # Draw a binary dependent variable.
+    # Draw a continuous dependent variable.
     aggreg_df[, 'y'] <- aggreg_df[, 'X_beta'] + rnorm(nrow(aggreg_df))
+
+
+  } else if (model == 'log') {
+
+    # Initialize the data frame with covariates.
+    aggreg_df <- data.frame(expand.grid(x1 = seq(1,3),
+                                        x2 = seq(5,10),
+                                        x3 = c(2, 2, 2, 4, 4, 4, 6, 6, 6)))
+
+    # Add an outcome according to a linear probability model.
+    # All coefficients are ones.
+    aggreg_df[, 'X_beta'] <- rowSums(aggreg_df[, c('x1', 'x2', 'x3')])*2 - 25
+
+    # Calculate the probabilities.
+    aggreg_df[, 'probs'] <- exp(aggreg_df[, 'X_beta'])/(1 + exp(aggreg_df[, 'X_beta']))
+
+
+    # Draw a binary dependent variable.
+    aggreg_df[, 'y'] <- as.integer(runif(nrow(aggreg_df)) <=  aggreg_df[, 'probs'])
 
 
   } else {

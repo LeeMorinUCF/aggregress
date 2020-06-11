@@ -406,7 +406,163 @@ agg_lm_reg_summ$cov.unscaled / ind_lm_reg_summ$cov.unscaled
 # (Binary Dependent Variable)
 ##################################################
 
+#--------------------------------------------------
+# Generate sample data
+#--------------------------------------------------
 
+set.seed(42)
+
+ind_log_data <- gen_agg_lm(model = 'log')
+
+# Variables appear correct.
+# All inside the unit interval.
+summary(ind_log_data)
+
+
+# Aggregate the counts.
+ind_log_data[, 'num'] <- 1
+
+agg_log_data <- aggregate(num ~ y + x1 + x2 + x3,
+                          data = ind_log_data,
+                          FUN = sum)
+
+summary(agg_log_data)
+
+
+#--------------------------------------------------
+# Estimate Linear Model from Individual Data
+#--------------------------------------------------
+
+ind_log_glm <- glm(y ~ x1 + x2 + x3, data = ind_log_data,
+                   family = 'binomial')
+
+#--------------------------------------------------
+# Estimate Linear Model from Aggregated Data
+#--------------------------------------------------
+
+
+# Modified lm function.
+# agg_log_glm <- agg_glm(y ~ x1 + x2 + x3, data = agg_log_data, weights = num)
+agg_log_glm <- glm(y ~ x1 + x2 + x3, data = agg_log_data, weights = num,
+                  family = 'binomial')
+
+
+#--------------------------------------------------
+# Compare the results
+#--------------------------------------------------
+
+
+# Compare summaries.
+summary(ind_log_glm)
+# summary_agg_lm(agg_log_glm)
+summary(agg_log_glm)
+
+
+attributes(ind_log_glm)
+# $`names`
+# [1] "coefficients"      "residuals"         "fitted.values"     "effects"
+# [5] "R"                 "rank"              "qr"                "family"
+# [9] "linear.predictors" "deviance"          "aic"               "null.deviance"
+# [13] "iter"              "weights"           "prior.weights"     "df.residual"
+# [17] "df.null"           "y"                 "converged"         "boundary"
+# [21] "model"             "call"              "formula"           "terms"
+# [25] "data"              "offset"            "control"           "method"
+# [29] "contrasts"         "xlevels"
+#
+# $class
+# [1] "glm" "lm"
+
+
+# [1,] "coefficients"
+ind_log_glm$coefficients
+agg_log_glm$coefficients
+ind_log_glm$coefficients - agg_log_glm$coefficients
+
+# [2,] "residuals"
+summary(ind_log_glm$residuals)
+summary(agg_log_glm$residuals)
+
+# [3,] "fitted.values"
+
+# [4,] "effects"
+# ind_log_glm$effects
+# agg_log_glm$effects
+
+# [5,] "R"
+ind_log_glm$R
+agg_log_glm$R
+agg_log_glm$R / ind_log_glm$R
+
+
+# [6,] "rank"
+ind_log_glm$rank
+agg_log_glm$rank
+
+# [7,] "qr"
+ind_log_glm$qr
+agg_log_glm$qr
+
+# [8,] "family"
+
+# [9,] "linear.predictors"
+
+# [10,] "deviance"
+ind_log_glm$deviance
+agg_log_glm$deviance
+
+# [11,] "aic"
+ind_log_glm$aic
+agg_log_glm$aic
+
+# [12,] "null.deviance"
+ind_log_glm$null.deviance
+agg_log_glm$null.deviance
+
+# [13,] "iter"
+ind_log_glm$iter
+agg_log_glm$iter
+
+# [14,] "weights"
+
+# [15,] "prior.weights"
+
+# [16,] "df.residual"
+ind_log_glm$df.residual
+agg_log_glm$df.residual
+
+# [17,] "df.null"
+ind_log_glm$df.null
+agg_log_glm$df.null
+
+# [18,] "y"
+
+# [19,] "converged"
+ind_log_glm$converged
+agg_log_glm$converged
+
+# [20,] "boundary"
+ind_log_glm$boundary
+agg_log_glm$boundary
+
+# [21,] "model"
+
+# [22,] "call"
+
+# [23,] "formula"
+
+# [24,] "terms"
+
+# [25,] "data"
+
+# [26,] "offset"
+
+# [27,] "control"
+
+# [28,] "method"
+
+# [29,] "contrasts"
+
+# [30,] "xlevels"
 
 
 
