@@ -20,9 +20,6 @@ test_that("Linear Probability Model results are correct", {
   expect_equal(ind_lpm_lm$coefficients, agg_lpm_lm$coefficients)
   expect_equal(ind_lpm_lm$rank, agg_lpm_lm$rank)
   expect_equal(ind_lpm_lm$df.residual, agg_lpm_lm$df.residual)
-  expect_equal(ind_lpm_lm$coefficients, agg_lpm_lm$coefficients)
-  expect_equal(ind_lpm_lm$coefficients, agg_lpm_lm$coefficients)
-  expect_equal(ind_lpm_lm$coefficients, agg_lpm_lm$coefficients)
 })
 
 

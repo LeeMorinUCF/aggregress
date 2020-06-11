@@ -259,15 +259,21 @@ summary_agg_lm <- function (object, correlation = FALSE, symbolic.cor = FALSE,
                                                        df.int)/rdf)
     ans$fstatistic <- c(value = (mss/(p - df.int))/resvar,
                         numdf = p - df.int, dendf = rdf)
+  } else {
+    ans$r.squared <- ans$adj.r.squared <- 0
   }
-  else ans$r.squared <- ans$adj.r.squared <- 0
-  ans$cov.unscaled <- R
-  dimnames(ans$cov.unscaled) <- dimnames(ans$coefficients)[c(1,
-                                                             1)]
-  if (correlation) {
-    ans$correlation <- (R * resvar)/outer(se, se)
-    dimnames(ans$correlation) <- dimnames(ans$cov.unscaled)
-    ans$symbolic.cor <- symbolic.cor
+  # Covariance matrix is still wrong on off-diagonal if not a LPM.
+  if (z$is_LPM) {
+    ans$cov.unscaled <- R
+    dimnames(ans$cov.unscaled) <- dimnames(ans$coefficients)[c(1, 1)]
+    if (correlation) {
+      ans$correlation <- (R * resvar)/outer(se, se)
+      dimnames(ans$correlation) <- dimnames(ans$cov.unscaled)
+      ans$symbolic.cor <- symbolic.cor
+    }
+  } else {
+    ans$cov.unscaled <- NULL
+    if (correlation) {ans$symbolic.cor <- NULL}
   }
   if (!is.null(z$na.action))
     ans$na.action <- z$na.action

@@ -374,12 +374,14 @@ rss_check_agg <- sum(y2_A) - 2*sum(w_A * y_A * f_A) + sum(w_A * f_A^2)
 # [7,] "df"
 ind_lm_reg_summ$df
 agg_lm_reg_summ$df
+# Same.
+
 
 
 # [8,] "r.squared"
 ind_lm_reg_summ$r.squared
 agg_lm_reg_summ$r.squared
-
+# Same.
 
 # [9,] "adj.r.squared"
 ind_lm_reg_summ$adj.r.squared
