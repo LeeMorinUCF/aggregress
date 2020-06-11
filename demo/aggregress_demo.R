@@ -79,12 +79,10 @@ summary_agg_lm(agg_lpm_lm)
 
 
 # Goal is to make sure that the lm objects are the same.
+# The estimates should be the same.
+# However, the data stored will be the same size as the aggregated
+# data -- and that's the point.
 
-attributes(ind_lpm_lm)
-# $`names`
-# [1] "coefficients"  "residuals"     "effects"       "rank"          "fitted.values"
-# [6] "assign"        "qr"            "df.residual"   "xlevels"       "call"
-# [11] "terms"         "model"
 
 # Compare each attribute with the weighted counterpart.
 
@@ -101,10 +99,6 @@ summary(agg_lpm_lm$residuals)
 summary(agg_lpm_lm$residuals*agg_lpm_lm$weights)
 # Weighted residuals have mean zero.
 
-# [3,] "effects"
-ind_lpm_lm$effects
-agg_lpm_lm$effects
-# Not sure what this is.
 
 # [4,] "rank"
 ind_lpm_lm$rank
@@ -112,59 +106,21 @@ agg_lpm_lm$rank
 # Same.
 
 
-# [5,] "fitted.values"
-summary(ind_lpm_lm$fitted.values)
-summary(agg_lpm_lm$fitted.values)
-# Not the same length but similar.
-
-# [6,] "assign"
-ind_lpm_lm$assign
-agg_lpm_lm$assign
-# Same.
-
-
-# [7,] "qr"
-ind_lpm_lm$qr
-agg_lpm_lm$qr
-# Not the same but are the length of the data frame.
-# Matrices in the qr decomposition?
-
-
 # [8,] "df.residual"
 ind_lpm_lm$df.residual
 agg_lpm_lm$df.residual
 # Same.
 
-# [9,] "xlevels"
-ind_lpm_lm$xlevels
-agg_lpm_lm$xlevels
-# Empty list in each case.
 
-# [10,] "call"
-ind_lpm_lm$call
-agg_lpm_lm$call
-# Different but accurate.
-
-
-# [11,] "terms"
-ind_lpm_lm$terms
-agg_lpm_lm$terms
-# Only difference is the extra column of weights.
-
-# [12,] "model"
-ind_lpm_lm$model
-agg_lpm_lm$model
-# Different but match true number of observations.
-
-
-# What matters is the coefficient table and summary.
-ind_lpm_coef <- coef(ind_lpm_lm)
 
 
 ##################################################
 # Linear Regression Models
 # (Continuous Dependent Variable)
 ##################################################
+
+
+
 
 
 

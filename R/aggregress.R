@@ -273,7 +273,8 @@ summary_agg_lm <- function (object, correlation = FALSE, symbolic.cor = FALSE,
 #' package. It is an internal function used for testing.
 #'
 #' @param model a string to denote the model with which
-#' to generate the data frame.
+#' to generate the data frame. It can be 'lpm' for a linear
+#' proability model, 'lm' for a linear regression model.
 #'
 #' @returns a data frame of response and covariates for
 #' linear regression.
@@ -281,25 +282,42 @@ summary_agg_lm <- function (object, correlation = FALSE, symbolic.cor = FALSE,
 gen_agg_lm <- function(model) {
 
   if (model == 'lpm') {
+    # Linear proability model.
 
     # Initialize the data frame with covariates.
-    agg_lm_df <- data.frame(expand.grid(x1 = seq(1,3),
+    aggreg_df <- data.frame(expand.grid(x1 = seq(1,3),
                                         x2 = seq(5,10),
                                         x3 = c(2, 2, 2, 4, 4, 6)))
 
     # Add an outcome according to a linear probability model.
     # All coefficients are ones.
-    agg_lm_df[, 'probs'] <- rowSums(agg_lm_df[, c('x1', 'x2', 'x3')]) / 20
+    aggreg_df[, 'probs'] <- rowSums(aggreg_df[, c('x1', 'x2', 'x3')]) / 20
 
 
     # Draw a binary dependent variable.
-    agg_lm_df[, 'y'] <- as.integer(runif(nrow(agg_lm_df)) <=  agg_lm_df[, 'probs'])
+    aggreg_df[, 'y'] <- as.integer(runif(nrow(aggreg_df)) <=  aggreg_df[, 'probs'])
+
+
+  } else if (model == 'lm') {
+
+    # Initialize the data frame with covariates.
+    aggreg_df <- data.frame(expand.grid(x1 = seq(1,3),
+                                        x2 = seq(5,10),
+                                        x3 = c(2, 2, 2, 4, 4, 6)))
+
+    # Add an outcome according to a linear probability model.
+    # All coefficients are ones.
+    aggreg_df[, 'X_beta'] <- rowSums(aggreg_df[, c('x1', 'x2', 'x3')]) / 20
+
+
+    # Draw a binary dependent variable.
+    aggreg_df[, 'y'] <- aggreg_df[, 'X_beta'] + rnorm(nrow(aggreg_df))
 
 
   } else {
     stop(sprintf('Model type %s not supported.', model))
   }
 
-  return(agg_lm_df)
+  return(aggreg_df)
 
 }
