@@ -90,7 +90,16 @@ ind_lpm_hccme_slow$coef_hccme[, 'Std. Error'] /
 
 
 # Modified lm function.
-agg_lpm_lm <- agg_lm(y ~ x1 + x2 + x3, data = agg_lpm_data, weights = num)
+agg_lpm_lm <- agg_lm(y ~ x1 + x2 + x3, data = agg_lpm_data, weights = num,
+                     x = TRUE)
+
+
+# Correct the satandard errors for heteroskedasticity.
+# agg_lpm_hccme <- white_hccme(agg_lpm_lm)
+# Throws an error about a mystery variable y.
+agg_lpm_hccme_slow <- white_hccme_slow(agg_lpm_lm)
+
+
 
 
 #--------------------------------------------------
@@ -99,12 +108,25 @@ agg_lpm_lm <- agg_lm(y ~ x1 + x2 + x3, data = agg_lpm_data, weights = num)
 
 
 # Compare summaries.
+
+# Homoskedastic case.
 summary(ind_lpm_lm)
 summary_agg_lm(agg_lpm_lm)
 
+# Heteroskedastic case.
+# Un-aggregated case (individual data).
+print(ind_lpm_hccme$coef_hccme)
+print(ind_lpm_hccme_slow$coef_hccme)
+# Aggregated data.
+print(agg_lpm_hccme_slow$coef_hccme)
 
+# Check for accuracy of SEs alone:
+ind_lpm_hccme_slow$coef_hccme[, 'Std. Error'] /
+  ind_lpm_hccme$coef_hccme[, 'Std. Error']
 
-
+agg_lpm_hccme_slow$coef_hccme[, 'Std. Error'] /
+  ind_lpm_hccme$coef_hccme[, 'Std. Error']
+# Correctomundo!
 
 
 

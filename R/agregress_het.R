@@ -63,18 +63,26 @@ white_hccme <- function(lm_in) {
 white_hccme_slow <- function(lm_in) {
 
   # Calculate the meat of the sandwich matrix.
-  if (length(ind_lpm_lm$x) == 0) {
-    stop('Missing the model matrix.',
+  if (length(lm_in$x) == 0) {
+    stop('Missing the model matrix. ',
          'Set x = TRUE when calling the lm function.')
   }
   n <- nrow(lm_in$x)
   k <- ncol(lm_in$x)
   vcov_meat <- matrix(0, nrow = k, ncol = k)
+  if (!is.null(lm_in$weights)) {
+    wtd_res_sq <- lm_in$weights * lm_in$residuals^2
+    vcov_dough <- matrix(rep(sqrt(lm_in$weights), k),
+                         nrow = n, ncol = k) * lm_in$x
+    vcov_bread <- solve(t(vcov_dough) %*% vcov_dough)
+  } else {
+    wtd_res_sq <- lm_in$residuals^2
+    vcov_bread <- solve(t(lm_in$x) %*% lm_in$x)
+  }
   for (i in 1:n) {
-    vcov_meat <- vcov_meat + lm_in$residuals[i]^2 *
+    vcov_meat <- vcov_meat + wtd_res_sq[i] *
       t(lm_in$x[i, , drop = FALSE]) %*% lm_in$x[i, ]
   }
-  vcov_bread <- solve(t(lm_in$x) %*% lm_in$x)
   vcov_mat <- vcov_bread %*% vcov_meat %*% vcov_bread
 
   # Standard erros are the square root of the diagonal of the
@@ -83,7 +91,15 @@ white_hccme_slow <- function(lm_in) {
 
 
   # Recalculate the t-statistics and p-values.
-  lm_stats_White <- coef(summary(lm_in))
+
+  # First obtain the regression output.
+  if (class(lm_in) == 'agg_lm') {
+    lm_stats_White <- coef(summary_agg_lm(lm_in))
+  } else {
+    lm_stats_White <- coef(summary(lm_in))
+  }
+
+
   # Replace the SEs.
   lm_stats_White[, 'Std. Error'] <- White_se
   # Recalculate the t-stats.
