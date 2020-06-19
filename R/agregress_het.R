@@ -16,7 +16,8 @@ white_hccme <- function(lm_in) {
 
   # Standard erros are the square root of thediagonal of the
   # White Heteroskedasticity-Corrected Covariance Matrix.
-  White_se <- sqrt(diag(sandwich::vcovHC(lm_in)))
+  vcov_mat <- sandwich::vcovHC(lm_in)
+  White_se <- sqrt(diag(vcov_mat))
 
   # Recalculate the t-statistics and p-values.
   lm_stats_White <- coef(summary(lm_in))
@@ -28,7 +29,10 @@ white_hccme <- function(lm_in) {
   lm_stats_White[, 'Pr(>|t|)'] <- 2*pt(- abs(lm_stats_White[, 't value']),
                                        df = lm_in$df.residuals)
 
-  return(lm_stats_White)
+  lm_out <- list(vcov_hccme = vcov_mat,
+                 coef_hccme = lm_stats_White)
+
+  return(lm_out)
 }
 
 
