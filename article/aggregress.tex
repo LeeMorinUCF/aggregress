@@ -1,0 +1,505 @@
+\documentclass[article]{jss}
+% \documentclass[codesnippet]{jss}
+
+
+
+%% -- LaTeX packages and custom commands ---------------------------------------
+
+%% recommended packages
+\usepackage{thumbpdf,lmodern}
+
+%% another package (only for this demo article)
+\usepackage{framed}
+
+%% Packages from FCVAR.m
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{float}   % used for better positioning of figures
+\usepackage{mathrsfs} % for script fonts
+% \usepackage[FIGTOPCAP]{subfigure}     %FIGTOPCAP puts captions on top of subfigures
+\usepackage{subfigure}     %FIGTOPCAP puts captions on top of subfigures (not for JSS)
+% \usepackage{subfig}
+
+%% new custom commands
+\newcommand{\class}[1]{`\code{#1}'}
+\newcommand{\fct}[1]{\code{#1()}}
+
+%% new custom commands from FCVAR.m
+\def\lrt{{\rm LR}_T}
+
+
+%% -- Article metainformation (author, title, ...) -----------------------------
+
+%% - \author{} with primary affiliation
+%% - \Plainauthor{} without affiliations
+%% - Separate authors by \And or \AND (in \author) or by comma (in \Plainauthor).
+%% - \AND starts a new line, \And does not.
+\author{Lealand Morin\\University of Central Florida}
+\Plainauthor{Lealand Morin}
+
+%% - \title{} in title case
+%% - \Plaintitle{} without LaTeX markup (if any)
+%% - \Shorttitle{} with LaTeX markup (if any), used as running title
+\title{\pkg{aggregress}: A Package for Regression Analysis with Aggregated Data}
+\Plaintitle{aggregress: A Package for Regression Analysis with Aggregated Data}
+\Shorttitle{Regression Analysis with Aggregated Data}
+
+%% - \Abstract{} almost as usual
+%% I figure that it is best to explain what this package does in plain English,  
+%% in case any normal people get past the title and want to know what this package does. 
+\Abstract{
+  Package \pkg{aggregress} makes adjustments to the lm object output
+  when the inputted data are in aggregated form.
+  That is, when the data frame has only the unique values of
+  all variables and the frequencies of these observations recorded in a column of weights.
+  For example, in the case of linear regression, the resulting object is indistinguishable from that from the \pkg{lm} object
+  original unaggregated data.
+  It includes adjustments to the statistics and diagnostics for a
+  regression model. 
+
+}
+
+%% - \Keywords{} with LaTeX markup, at least one required
+%% - \Plainkeywords{} without LaTeX markup (if necessary)
+%% - Should be comma-separated and in sentence case.
+\Keywords{regression, lm, glm, aggregate, group by}
+\Plainkeywords{regression, lm, glm, aggregate, group by}
+
+%% - \Address{} of at least one author
+%% - May contain multiple affiliations for each author
+%%   (in extra lines, separated by \emph{and}\\).
+%% - May contain multiple authors for the same affiliation
+%%   (in the same first line, separated by comma).
+\Address{
+  Lealand Morin\\
+  Department of Economics\\
+  University of Central Florida\\
+  E-mail: \email{Lealand.Morin@ucf.edu}
+}
+
+\begin{document}
+
+
+%% -- Introduction -------------------------------------------------------------
+
+%% - In principle "as usual".
+%% - But should typically have some discussion of both _software_ and _methods_.
+%% - Use \proglang{}, \pkg{}, and \code{} markup throughout the manuscript.
+%% - If such markup is in (sub)section titles, a plain text version has to be
+%%   added as well.
+%% - All software mentioned should be properly \cite-d.
+%% - All abbreviations should be introduced.
+%% - Unless the expansions of abbreviations are proper names (like "Journal
+%%   of Statistical Software" above) they should be in sentence case (like
+%%   "generalized linear models" below).
+
+\section[Dealing with Aggregate Data in R]{Dealing with Aggregate Data in \proglang{R}} \label{sec:intro}
+
+% JSS Notes:
+%\begin{leftbar}
+%The introduction is in principle ``as usual''. However, it should usually embed
+%both the implemented \emph{methods} and the \emph{software} into the respective
+%relevant literature. For the latter both competing and complementary software
+%should be discussed (within the same software environment and beyond), bringing
+%out relative (dis)advantages. All software mentioned should be properly
+%\verb|\cite{}|d. 
+% 
+%For writing about software JSS requires authors to use the markup
+%\verb|\proglang{}| (programming languages and large programmable systems),
+%\verb|\pkg{}| (software packages), \verb|\code{}| (functions, commands,
+%arguments, etc.). If there is such markup in (sub)section titles (as above), a
+%plain text version has to be provided in the {\LaTeX} command as well. Below we
+%also illustrate how abbrevations should be introduced and citation commands can
+%be employed. See the {\LaTeX} code for more details.
+% \end{leftbar}
+
+
+  Package \pkg{aggregress} makes adjustments to the lm object output
+  when the inputted data are in aggregated form.
+  That is, when the data frame has only the unique values of
+  all variables and the frequencies of these observations recorded in a column of weights.
+  For example, in the case of linear regression, the resulting object is indistinguishable from that from the \pkg{lm} object
+  original unaggregated data.
+  It includes adjustments to the statistics and diagnostics for a
+  regression model. 
+
+
+To quote the help files for the \code{lm} function:
+``Therefore, the sigma estimate and residual degrees of freedom
+may be suboptimal; in the case of replication weights, even wrong.
+Hence, standard errors and analysis of variance tables should be
+treated with care.''
+This packages makes adjustments so that the sigma estimate and
+residual degrees of freedom are not suboptimal or wrong; they are correct.
+
+
+
+% 
+There are several R packages \citep{R} available for working with aggregated data. 
+% 
+The packages \pkg{markovchain} \citep{pkg:markovchain} is not one of them. 
+
+
+
+
+
+
+
+
+
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale = .6, keepaspectratio=true]{Figures/Rlogo.png}
+  \caption{Caption goes here}
+  \label{fig:Rlogo}
+\end{figure}
+
+
+
+% JSS Style Notes:
+%% -- Manuscript ---------------------------------------------------------------
+%% - In principle "as usual" again.
+%% - When using equations (e.g., {equation}, {eqnarray}, {align}, etc.
+%%   avoid empty lines before and after the equation (which would signal a new
+%%   paragraph.
+%% - When describing longer chunks of code that are _not_ meant for execution
+%%   (e.g., a function synopsis or list of arguments), the environment {Code}
+%%   is recommended. Alternatively, a plain {verbatim} can also be used.
+%%   (For executed code see the next section.)
+
+\section{Model} \label{sec:model}
+
+% JSS notes:
+%\begin{leftbar}
+%Note that around the \verb|{equation}| above there should be no spaces (avoided
+%in the {\LaTeX} code by \verb|%| lines) so that ``normal'' spacing is used and
+%not a new paragraph started.
+%\end{leftbar}
+
+
+Is there really a model? 
+
+It's more about what others are missing. 
+
+
+Computational benefit: $O(\tilde{n})$ vs.~$O(n)$, where $n$ is the sample size and $\tilde{n}$ is the number of rows in the aggregated dataset. 
+This number is defined by \code{n_tilde <- length(unique(data[, column_names))} where \code{column_names} is a character vector of the names of the depenedent and independent variables in the regression model. 
+
+
+This can considerably reduce the memory requirements for estimating a model. 
+This is especially true when using categorical variables, since the length of the dataset is limited by the number of permutations of the discrete dataset. 
+
+
+There is a provision to categorize a continuous variable onto a discrete grid of values. 
+However, it is well known that this sort of measurement error in the covariates can lead to a downward bias in the magnitude of the regression coefficients. 
+To account for this, the bias correction of () is applied. 
+
+
+
+What changes with the linear model, the linear probability model and logistic regression? 
+
+
+What adjustments are made for heteroskedasticity? 
+
+
+What adjustments are made for measurement error induced by aggregation? 
+
+How can I calculate the AUROC for a logistic regression with aggregated data? 
+
+
+
+
+
+% JSS Notes:
+%% -- Illustrations ------------------------------------------------------------
+%%
+%% - Virtually all JSS manuscripts list source code along with the generated
+%%   output. The style files provide dedicated environments for this.
+%% - In R, the environments {Sinput} and {Soutput} - as produced by Sweave() or
+%%   or knitr using the render_sweave() hook - are used (without the need to
+%%   load Sweave.sty).
+%% - Equivalently, {CodeInput} and {CodeOutput} can be used.
+%% - The code input should use "the usual" command prompt in the respective
+%%   software system.
+%% - For R code, the prompt "R> " should be used with "+  " as the
+%%   continuation prompt.
+%% - Comments within the code chunks should be avoided - these should be made
+%%   within the regular LaTeX text.
+
+%But first... Examples of displaying code in JSS style. 
+%
+%The data can be loaded by
+%%
+%\begin{CodeChunk}
+%\begin{CodeInput}
+%R> data("quine", package = "MASS")
+%\end{CodeInput}
+%\end{CodeChunk}
+%%
+%and a basic frequency distribution of the response variable is displayed in
+%Figure~\ref{fig:quine}.
+
+%\begin{leftbar}
+%For code input and output, the style files provide dedicated environments.
+%Either the ``agnostic'' \verb|{CodeInput}| and \verb|{CodeOutput}| can be used
+%or, equivalently, the environments \verb|{Sinput}| and \verb|{Soutput}| as
+%produced by \fct{Sweave} or \pkg{knitr} when using the \code{render_sweave()}
+%hook. Please make sure that all code is properly spaced, e.g., using
+%\code{y = a + b * x} and \emph{not} \code{y=a+b*x}. Moreover, code input should
+%use ``the usual'' command prompt in the respective software system. For
+%\proglang{R} code, the prompt \code{"R> "} should be used with \code{"+  "} as
+%the continuation prompt. Generally, comments within the code chunks should be
+%avoided -- and made in the regular {\LaTeX} text instead. Finally, empty lines
+%before and after code input/output should be avoided (see above).
+%\end{leftbar}
+
+% JSS format for figures:
+%A basic frequency distribution of the response variable is displayed in
+%%Figure~\ref{fig:quine}.
+%
+%\begin{figure}[t!]
+%\centering
+%\includegraphics{delete-this-image}
+%\caption{\label{fig:quine} Frequency distribution for number of days absent
+%from school.}
+%\end{figure}
+
+
+%As a first model for the \code{quine} data, we fit the basic Poisson regression
+%model. (Note that JSS prefers when the second line of code is indented by two
+%spaces.)
+%%
+%\begin{CodeChunk}
+%\begin{CodeInput}
+%R> m_pois <- glm(Days ~ (Eth + Sex + Age + Lrn)^2, data = quine,
+%+    family = poisson)
+%\end{CodeInput}
+%\end{CodeChunk}
+%%
+%Hence, the full summary of that model is shown below.
+%%
+%\begin{CodeChunk}
+%\begin{CodeInput}
+%R> summary(m_nbin)
+%\end{CodeInput}
+%\begin{CodeOutput}
+%Call:
+%glm.nb(formula = Days ~ (Eth + Sex + Age + Lrn)^2, data = quine, 
+%    init.theta = 1.60364105, link = log)
+%
+%Coefficients: (1 not defined because of singularities)
+%            Estimate Std. Error z value Pr(>|z|)    
+%(Intercept)  3.00155    0.33709   8.904  < 2e-16 ***
+% ...
+%\end{CodeOutput}
+%\end{CodeChunk}
+%
+%
+%
+%Here is another example of code:
+%\begin{Code}
+%glm(formula, data, subset, na.action, weights, offset,
+%  family = gaussian, start = NULL, control = glm.control(...),
+%  model = TRUE, y = TRUE, x = FALSE, ...)
+%\end{Code}
+
+
+%\begin{leftbar}
+%As the synopsis above is a code listing that is not meant to be executed,
+%one can use either the dedicated \verb|{Code}| environment or a simple
+%\verb|{verbatim}| environment for this. Again, spaces before and after should be
+%avoided.
+%\end{leftbar}
+
+
+%% -- Main Program ---------------------------------------------------------
+% \section{Main Program} \label{sec:main}
+% Renamed as Example session
+
+\section{Example} \label{sec:example}
+
+A demonstration of analysis is shown in \verb|aggregress_demo.R| and it serves as an example of what a typical session of model specification, estimation and testing can include. This procedure includes the following steps:
+
+\begin{enumerate}
+\item Organizing data
+\item Choosing estimation options
+\item Lag selection
+\item Model estimation
+\item Hypothesis testing
+\end{enumerate}
+
+
+\subsection{Organizing data} \label{subsec:data}
+
+
+\subsection{Choosing options} \label{subsec:options}
+
+
+\subsection{Lag-order selection}  \label{subsec:lags}
+
+
+\subsection{Model estimation}  \label{subsec:estimation}
+
+
+\subsection{Hypothesis testing} \label{subsec:testing}
+
+
+
+
+%\begin{leftbar}
+%Finally, there might be a reference to a \verb|{table}| such as
+%Table~\ref{tab:overview}. Usually, these are placed at the top of the page
+%(\verb|[t!]|), centered (\verb|\centering|), with a caption below the table,
+%column headers and captions in sentence style, and if possible avoiding vertical
+%lines.
+%\end{leftbar}
+
+%\begin{table}[t!]
+%\centering
+%\begin{tabular}{lllp{7.4cm}}
+%\hline
+%Type           & Distribution & Method   & Description \\ \hline
+%GLM            & Poisson      & ML       & Poisson regression: classical GLM,
+%                                           estimated by maximum likelihood (ML) \\
+%Zero-augmented & Poisson      & ML       & Zero-inflated Poisson (ZIP),
+%                                           hurdle Poisson \\
+%               & NB           & ML       & Zero-inflated NB (ZINB),
+%                                           hurdle NB \\ \hline
+%\end{tabular}
+%\caption{\label{tab:overview} Overview of various count regression models. The
+%table is usually placed at the top of the page (\texttt{[t!]}), centered
+%(\texttt{centering}), has a caption below the table, column headers and captions
+%are in sentence style, and if possible vertical lines should be avoided.}
+%\end{table}
+
+
+
+
+%% -- Summary/conclusions/discussion -------------------------------------------
+
+\section{Summary and discussion} \label{sec:summary}
+
+This is a good package because...
+
+
+%% -- Optional special unnumbered sections -------------------------------------
+
+\section*{Computational details}
+
+%\begin{leftbar}
+%If necessary or useful, information about certain computational details
+%such as version numbers, operating systems, or compilers could be included
+%in an unnumbered section. Also, auxiliary packages (say, for visualizations,
+%maps, tables, \dots) that are not cited in the main text can be credited here.
+%\end{leftbar}
+
+The results in this paper were obtained using
+\proglang{R}~3.5.1. 
+with the \pkg{aggregress} package Version 0.0.0.9000. 
+\proglang{R} itself
+and all packages used are available from the Comprehensive
+\proglang{R} Archive Network (CRAN) at
+\url{https://CRAN.R-project.org/}.
+
+
+The development version of this package is available by using the \pkg{devtools} package, with which the latest version can be installed by 
+
+\verb|devtools::install_github(LeeMorinUCF/aggregress)|. 
+
+
+
+\section*{Acknowledgments}
+
+%\begin{leftbar}
+%All acknowledgments (note the AE spelling) should be collected in this
+%unnumbered section before the references. It may contain the usual information
+%about funding and feedback from colleagues/reviewers/etc. Furthermore,
+%information such as relative contributions of the authors may be added here
+%(if any).
+%\end{leftbar}
+
+To be amended: I am particularly grateful to .... For useful comments and helpful suggestions
+on earlier versions of this paper, I thank ....
+
+
+
+%% -- Bibliography -------------------------------------------------------------
+%% - References need to be provided in a .bib BibTeX database.
+%% - All references should be made with \cite, \citet, \citep, \citealp etc.
+%%   (and never hard-coded). See the FAQ for details.
+%% - JSS-specific markup (\proglang, \pkg, \code) should be used in the .bib.
+%% - Titles in the .bib should be in title case.
+%% - DOIs should be included where available.
+
+\bibliography{references}
+
+%\begin{leftbar}
+%Note that References have to be written in Title Case, as opposed to sentence case, 
+%sometimes contrary to the convention in the journals themselves. 
+%\end{leftbar}
+
+
+%% -- Appendix (if any) --------------------------------------------------------
+%% - After the bibliography with page break.
+%% - With proper section titles and _not_ just "Appendix".
+
+% \newpage
+
+% \begin{appendix}
+
+% \section{More technical details} \label{app:technical}
+
+%\begin{leftbar}
+%Appendices can be included after the bibliography (with a page break). Each
+%section within the appendix should have a proper section title (rather than
+%just \emph{Appendix}).
+%
+%For more technical style details, please check out JSS's style FAQ at
+%\url{https://www.jstatsoft.org/pages/view/style#frequently-asked-questions}
+%which includes the following topics:
+%\begin{itemize}
+%  \item Title vs.\ sentence case.
+%  \item Graphics formatting.
+%  \item Naming conventions.
+%  \item Turning JSS manuscripts into \proglang{R} package vignettes.
+%  \item Trouble shooting.
+%  \item Many other potentially helpful details\dots
+%\end{itemize}
+%\end{leftbar}
+
+% Technical details go here. 
+
+
+%\section[Using BibTeX]{Using \textsc{Bib}{\TeX}} \label{app:bibtex}
+%
+%\begin{leftbar}
+%References need to be provided in a \textsc{Bib}{\TeX} file (\code{.bib}). All
+%references should be made with \verb|\cite|, \verb|\citet|, \verb|\citep|,
+%\verb|\citealp| etc.\ (and never hard-coded). This commands yield different
+%formats of author-year citations and allow to include additional details (e.g.,
+%pages, chapters, \dots) in brackets. In case you are not familiar with these
+%commands see the JSS style FAQ for details.
+%
+%Cleaning up \textsc{Bib}{\TeX} files is a somewhat tedious task -- especially
+%when acquiring the entries automatically from mixed online sources. However,
+%it is important that informations are complete and presented in a consistent
+%style to avoid confusions. JSS requires the following format.
+%\begin{itemize}
+%  \item JSS-specific markup (\verb|\proglang|, \verb|\pkg|, \verb|\code|) should
+%    be used in the references.
+%  \item Titles should be in title case.
+%  \item Journal titles should not be abbreviated and in title case.
+%  \item DOIs should be included where available.
+%  \item Software should be properly cited as well. For \proglang{R} packages
+%    \code{citation("pkgname")} typically provides a good starting point.
+%\end{itemize}
+%\end{leftbar}
+
+% \end{appendix}
+
+%% -----------------------------------------------------------------------------
+
+
+\end{document}
