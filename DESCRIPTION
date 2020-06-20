@@ -6,10 +6,15 @@ Authors@R:
            family = "Morin",
            role = c("aut", "cre"),
            email = "lee.morin.dev@gmail.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: An adjustment to the lm object output when the inputted data are aggregated. 
-    The resulting object is indistinguishable from that from the original unaggregated data. 
-    It includes adjustments to the statistics and diagnostics. 
+           comment = c(ORCID = "0000-0001-8539-1386"))
+Description: The aggregress package makes adjustments to the lm object output
+  when the inputted data are in aggregated form.
+  That is, when the data frame has a list of unique values of
+  all variables with the frequencies recorded in a column of weights.
+  The resulting object is indistinguishable from that from the
+  original unaggregated data.
+  It includes adjustments to the statistics and diagnostics for a
+  regression model. 
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

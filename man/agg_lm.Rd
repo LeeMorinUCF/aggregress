@@ -14,6 +14,7 @@ agg_lm(
   model = TRUE,
   x = FALSE,
   y = FALSE,
+  y_squared = NULL,
   qr = TRUE,
   singular.ok = TRUE,
   contrasts = NULL,
