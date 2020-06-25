@@ -457,6 +457,9 @@ summary(ind_log_glm)
 # summary_agg_lm(agg_log_glm)
 summary(agg_log_glm)
 
+coef(summary(agg_log_glm))[, 'Std. Error'] /
+  coef(summary(ind_log_glm))[, 'Std. Error']
+
 
 attributes(ind_log_glm)
 # $`names`
